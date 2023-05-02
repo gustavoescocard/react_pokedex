@@ -2,15 +2,17 @@ import logo from './logo.svg';
 import './App.css';
 import Navbar from './components/Navbar';
 import React from 'react';
+import Searchbar from './components/Searchbar';
 
 function App() {
   return (
     <>
-      <React.Fragment>
-        <Navbar />
-      </React.Fragment>
+      <Navbar />
 
-      <div className="App"></div>
+      <Searchbar />
+
+      <div className="App">
+      </div>
     </>
   );
 }

@@ -1,7 +1,7 @@
 import React from "react";
 
 const Navbar = () => {
-    const logoPath = "https://raw.githubusercontent.com/PokeAPI/media/master/logo/pokeapi_256.png"
+    const logoPath = "https://raw.githubusercontent.com/PokeAPI/media/master/logo/pokeapi_256.png";
   return (
     <nav>
       <div>
