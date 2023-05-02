@@ -5,12 +5,14 @@ import React, { useEffect, useState } from 'react';
 import Searchbar from './components/Searchbar';
 import Pokedex from './components/Pokedex';
 import { getPokemonData, getPokemons } from './api';
+import { FavoriteProvider } from './context/favoritesContext';
 
 function App() {
   const [page, setPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [loading, setLoading] = useState(false)
   const [pokemons, setPokemons] = useState([])
+  const [favorites, setFavorites] = useState([])
 
   const itensPerPage = 25
   const fetchPokemons = async () => {
@@ -31,21 +33,42 @@ function App() {
   }
 
   useEffect(() => {
-    fetchPokemons();
+    fetchPokemons()
   }, [page])
 
+  const updateFavoritePokemons = (name) => {
+    const updatedFavorites = [...favorites]
+    const favoriteIndex = favorites.indexOf(name)
+
+    if(favoriteIndex >= 0) {
+      updatedFavorites.slice(favoriteIndex, 1)
+    } else {
+      updatedFavorites.push(name)
+    }
+    setFavorites(updatedFavorites)
+  }
+
   return (
-    <>
-      <Navbar />
-      <Searchbar />
-      <Pokedex
-        pokemons={pokemons}
-        loading={loading}
-        page={page}
-        setPage={setPage}
-        totalPages={totalPages} />
-    </>
+    <FavoriteProvider
+      value={{
+        favoritePokemons: favorites,
+        updateFavoritePokemons: updateFavoritePokemons
+      }}
+    >
+      <>
+
+        <Navbar />
+        <Searchbar />
+
+        <Pokedex
+          pokemons={pokemons}
+          loading={loading}
+          page={page}
+          setPage={setPage}
+          totalPages={totalPages} />
+      </>
+    </FavoriteProvider>
   );
 }
 
-export default App;
+export default App
