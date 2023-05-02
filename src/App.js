@@ -4,7 +4,7 @@ import Navbar from './components/Navbar';
 import React, { useEffect, useState } from 'react';
 import Searchbar from './components/Searchbar';
 import Pokedex from './components/Pokedex';
-import { getPokemonData, getPokemons } from './api';
+import { getPokemonData, getPokemons, searchPokemon } from './api';
 import { FavoriteProvider } from './context/favoritesContext';
 
 const favoritesKey = "f"
@@ -13,6 +13,7 @@ function App() {
   const [page, setPage] = useState(0)
   const [totalPages, setTotalPages] = useState(0)
   const [loading, setLoading] = useState(false)
+  const [notFound, setNotFound] = useState(false)
   const [pokemons, setPokemons] = useState([])
   const [favorites, setFavorites] = useState([])
 
@@ -20,6 +21,7 @@ function App() {
   const fetchPokemons = async () => {
     try {
       setLoading(true)
+      setNotFound(false)
       const data = await getPokemons(itensPerPage, itensPerPage * page)
       const promises = data.results.map(async (pokemon) => {
         return await getPokemonData(pokemon.url)
@@ -60,6 +62,24 @@ function App() {
     setFavorites(updatedFavorites)
   }
 
+  const onSearchHandler = async (pokemon) => {
+    if(!pokemon) {
+      return fetchPokemons()
+    }
+
+    setLoading(true)
+    setNotFound(false)
+    const result = await searchPokemon(pokemon)
+    if(!result) {
+      setNotFound(true)
+    } else {
+      setPokemons([result])
+      setPage(0)
+      setTotalPages(1)
+    }
+    setLoading(false)
+  }
+
   return (
     <FavoriteProvider
       value={{
@@ -70,14 +90,18 @@ function App() {
       <>
 
         <Navbar />
-        <Searchbar />
+        <Searchbar onSearch={onSearchHandler} />
 
-        <Pokedex
-          pokemons={pokemons}
-          loading={loading}
-          page={page}
-          setPage={setPage}
-          totalPages={totalPages} />
+        {notFound ? (
+          <div className='not-found-text'>Pokémon não encontrado</div>
+        ) : (
+          <Pokedex
+            pokemons={pokemons}
+            loading={loading}
+            page={page}
+            setPage={setPage}
+            totalPages={totalPages} />
+        )}
       </>
     </FavoriteProvider>
   );
